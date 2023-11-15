@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="calc.css">
+  <title>Basic Calculator</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      margin: 0;
+      color: aqua;
+    
+    }
+
+    #calculator {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 8px;
+      max-width: 300px;
+      margin: auto;
+    }
+
+    #display {
+      grid-column: span 4;
+      height: 40px;
+      text-align: right;
+      padding: 0 10px;
+      font-size: 1.5rem;
+      color: blue;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+     
+    #fullstop {
+        border-radius: 10px;
+        width: 50px;
+    }
+
+    #clear {
+        border-radius: 10px;
+        width: 50px;
+        background-color: blue;
+    }
+  </style>
+</head>
+<body>
+
+<div id="calculator">
+  <div id="display"></div>
+  <button id="clear" onclick="clearDisplay()">Clear</button>
+  <button onclick="appendToDisplay('/')">/</button>
+  <button onclick="appendToDisplay('*')">*</button>
+  <button onclick="appendToDisplay('7')">7</button>
+  <button onclick="appendToDisplay('8')">8</button>
+  <button onclick="appendToDisplay('9')">9</button>
+  <button onclick="appendToDisplay('-')">-</button>
+  <button onclick="appendToDisplay('4')">4</button>
+  <button onclick="appendToDisplay('5')">5</button>
+  <button onclick="appendToDisplay('6')">6</button>
+  <button onclick="appendToDisplay('+')">+</button>
+  <button onclick="appendToDisplay('1')">1</button>
+  <button onclick="appendToDisplay('2')">2</button>
+  <button onclick="appendToDisplay('3')">3</button>
+  <button onclick="calculate()">=</button>
+  <button onclick="appendToDisplay('0')">0</button>
+  <button id="fullstop" onclick="appendToDisplay('.')">.</button>
+</div>
+
+<script>
+  let display = document.getElementById('display');
+
+  function appendToDisplay(value) {
+    display.innerText += value;
+  }
+
+  function clearDisplay() {
+    display.innerText = '';
+  }
+
+  function calculate() {
+    try {
+      display.innerText = eval(display.innerText);
+    } catch (error) {
+      display.innerText = 'Error';
+    }
+  }
+</script>
+
+</body>
+</html>
+
+
