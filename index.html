@@ -4,52 +4,245 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="calc.css" />
-    <title>Basic Calculator</title>
-    <style></style>
+    <title>Advanced Calculator</title>
   </head>
   <body>
-    <div id="calculator">
-      <div id="display"></div>
-      <button id="clear" onclick="clearDisplay()">Clear</button>
-      <button onclick="appendToDisplay('/')">/</button>
-      <button onclick="appendToDisplay('*')">*</button>
-      <button onclick="appendToDisplay('+')">+</button>
-      <button onclick="calculate()">=</button>
-      <button onclick="appendToDisplay('-')">-</button>
-
-      <button onclick="appendToDisplay('9')">9</button>
-      <button onclick="appendToDisplay('8')">8</button>
-
-      <button onclick="appendToDisplay('4')">4</button>
-      <button onclick="appendToDisplay('5')">5</button>
-      <button onclick="appendToDisplay('6')">6</button>
-      <button onclick="appendToDisplay('7')">7</button>
-      <button onclick="appendToDisplay('1')">1</button>
-      <button onclick="appendToDisplay('2')">2</button>
-      <button onclick="appendToDisplay('3')">3</button>
-      <button onclick="appendToDisplay('0')">0</button>
-
-      <button id="fullstop" onclick="appendToDisplay('.')">.</button>
+    <div class="calculator-container">
+      <div class="calculator" id="calculator" role="application" aria-label="Calculator">
+        <div class="display-container">
+          <div class="display" id="display" role="textbox" aria-label="Calculator display" tabindex="0">0</div>
+        </div>
+        
+        <div class="button-grid">
+          <!-- Row 1: Clear, Backspace, Operators -->
+          <button class="btn btn-clear" onclick="clearDisplay()" aria-label="Clear all">C</button>
+          <button class="btn btn-backspace" onclick="backspace()" aria-label="Backspace">⌫</button>
+          <button class="btn btn-operator" onclick="setOperator('/')" aria-label="Divide">÷</button>
+          <button class="btn btn-operator" onclick="setOperator('*')" aria-label="Multiply">×</button>
+          
+          <!-- Row 2: 7, 8, 9, Minus -->
+          <button class="btn btn-number" onclick="appendToDisplay('7')" aria-label="Seven">7</button>
+          <button class="btn btn-number" onclick="appendToDisplay('8')" aria-label="Eight">8</button>
+          <button class="btn btn-number" onclick="appendToDisplay('9')" aria-label="Nine">9</button>
+          <button class="btn btn-operator" onclick="setOperator('-')" aria-label="Subtract">−</button>
+          
+          <!-- Row 3: 4, 5, 6, Plus -->
+          <button class="btn btn-number" onclick="appendToDisplay('4')" aria-label="Four">4</button>
+          <button class="btn btn-number" onclick="appendToDisplay('5')" aria-label="Five">5</button>
+          <button class="btn btn-number" onclick="appendToDisplay('6')" aria-label="Six">6</button>
+          <button class="btn btn-operator" onclick="setOperator('+')" aria-label="Add">+</button>
+          
+          <!-- Row 4: 1, 2, 3, Equals -->
+          <button class="btn btn-number" onclick="appendToDisplay('1')" aria-label="One">1</button>
+          <button class="btn btn-number" onclick="appendToDisplay('2')" aria-label="Two">2</button>
+          <button class="btn btn-number" onclick="appendToDisplay('3')" aria-label="Three">3</button>
+          <button class="btn btn-equals" onclick="calculate()" aria-label="Equals" rowspan="2">=</button>
+          
+          <!-- Row 5: 0, Decimal -->
+          <button class="btn btn-number btn-zero" onclick="appendToDisplay('0')" aria-label="Zero">0</button>
+          <button class="btn btn-number" onclick="appendToDisplay('.')" aria-label="Decimal point">.</button>
+        </div>
+      </div>
     </div>
 
     <script>
       let display = document.getElementById("display");
+      let currentInput = "0";
+      let operator = null;
+      let previousInput = null;
+      let shouldResetDisplay = false;
+      let displayExpression = "0"; // Track the full expression for display
+
+      // Initialize display
+      updateDisplay();
+
+      // Input validation helper
+      function isValidInput(value) {
+        return !isNaN(value) && isFinite(value);
+      }
+
+      // Format number for display
+      function formatNumber(num) {
+        if (num.toString().length > 12) {
+          return parseFloat(num.toExponential(8));
+        }
+        return num;
+      }
+
+      function updateDisplay() {
+        display.textContent = displayExpression;
+        
+        // Add visual feedback
+        display.classList.add('updating');
+        setTimeout(() => {
+          display.classList.remove('updating');
+        }, 150);
+      }
 
       function appendToDisplay(value) {
-        display.innerText += value;
+        if (shouldResetDisplay) {
+          currentInput = "0";
+          shouldResetDisplay = false;
+        }
+
+        // Prevent multiple decimal points
+        if (value === "." && currentInput.includes(".")) {
+          return;
+        }
+
+        // Limit display length to prevent overflow
+        if (currentInput.length >= 12) {
+          return;
+        }
+
+        if (currentInput === "0" && value !== ".") {
+          currentInput = value;
+        } else {
+          currentInput += value;
+        }
+
+        // Update the display expression
+        if (operator && !shouldResetDisplay) {
+          // We're continuing to input after an operator, update the expression
+          displayExpression = displayExpression.replace(/[+\-*/].*$/, operator + " " + currentInput);
+        } else if (!operator) {
+          // No operator set, just show current input
+          displayExpression = currentInput;
+        }
+
+        updateDisplay();
       }
 
       function clearDisplay() {
-        display.innerText = "";
+        currentInput = "0";
+        operator = null;
+        previousInput = null;
+        shouldResetDisplay = false;
+        displayExpression = "0";
+        // Remove any error states
+        display.classList.remove('error');
+        updateDisplay();
+      }
+
+      function backspace() {
+        // Don't allow backspace if display is in error state
+        if (display.classList.contains('error')) {
+          return;
+        }
+        
+        if (currentInput.length > 1) {
+          currentInput = currentInput.slice(0, -1);
+        } else {
+          currentInput = "0";
+        }
+        
+        // Update display expression
+        if (operator && !shouldResetDisplay) {
+          displayExpression = displayExpression.replace(/[+\-*/].*$/, operator + " " + currentInput);
+        } else if (!operator) {
+          displayExpression = currentInput;
+        }
+        
+        updateDisplay();
+      }
+
+      function setOperator(op) {
+        // Don't allow operators if display is in error state
+        if (display.classList.contains('error')) {
+          return;
+        }
+        
+        // If there's already an operator and previous input, calculate first
+        if (operator && previousInput !== null && !shouldResetDisplay) {
+          calculate();
+        }
+        
+        operator = op;
+        previousInput = parseFloat(currentInput);
+        shouldResetDisplay = true;
+        
+        // Update display expression to show the operator
+        displayExpression = currentInput + " " + op + " ";
+        updateDisplay();
       }
 
       function calculate() {
-        try {
-          display.innerText = eval(display.innerText);
-        } catch (error) {
-          display.innerText = "Error";
+        if (operator && previousInput !== null) {
+          const current = parseFloat(currentInput);
+          let result;
+
+          switch (operator) {
+            case '+':
+              result = previousInput + current;
+              break;
+            case '-':
+              result = previousInput - current;
+              break;
+            case '*':
+              result = previousInput * current;
+              break;
+            case '/':
+              if (current === 0) {
+                currentInput = "Error";
+                display.classList.add('error');
+                updateDisplay();
+                setTimeout(() => {
+                  display.classList.remove('error');
+                  clearDisplay();
+                }, 2000);
+                return;
+              }
+              result = previousInput / current;
+              break;
+            default:
+              return;
+          }
+
+          // Round to avoid floating point precision issues
+          result = Math.round(result * 100000000) / 100000000;
+          
+          // Format the result properly
+          result = formatNumber(result);
+          currentInput = result.toString();
+          displayExpression = currentInput;
+          operator = null;
+          previousInput = null;
+          shouldResetDisplay = true;
+          updateDisplay();
         }
       }
+
+
+      // Keyboard support
+      document.addEventListener('keydown', function(event) {
+        const key = event.key;
+        
+        // Prevent default behavior for calculator keys
+        if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '+', '-', '*', '/', 'Enter', '=', 'Escape', 'Backspace'].includes(key)) {
+          event.preventDefault();
+        }
+        
+        if (key >= '0' && key <= '9' || key === '.') {
+          appendToDisplay(key);
+        } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+          setOperator(key);
+        } else if (key === 'Enter' || key === '=') {
+          calculate();
+        } else if (key === 'Escape' || key === 'c' || key === 'C') {
+          clearDisplay();
+        } else if (key === 'Backspace') {
+          backspace();
+        }
+      });
+
+      // Focus management for accessibility
+      display.addEventListener('focus', function() {
+        this.style.outline = '2px solid #007bff';
+      });
+
+      display.addEventListener('blur', function() {
+        this.style.outline = 'none';
+      });
     </script>
   </body>
 </html>
