@@ -1,0 +1,34 @@
+{
+  "name": "codsoft-web-calculator",
+  "version": "1.0.0",
+  "description": "A modern, responsive calculator built with HTML, CSS, and JavaScript",
+  "main": "index.html",
+  "scripts": {
+    "audit": "node audit-file-consistency.cjs",
+    "audit:watch": "nodemon audit-file-consistency.cjs",
+    "serve": "python -m http.server 8000",
+    "serve:node": "npx serve ."
+  },
+  "keywords": [
+    "calculator",
+    "web",
+    "html",
+    "css",
+    "javascript",
+    "responsive",
+    "accessibility"
+  ],
+  "author": "Konadu Prince",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Konadu-Prince/CODSOFT-web-calculator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Konadu-Prince/CODSOFT-web-calculator/issues"
+  },
+  "homepage": "https://github.com/Konadu-Prince/CODSOFT-web-calculator#readme"
+}
